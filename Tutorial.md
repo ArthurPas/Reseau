@@ -78,3 +78,47 @@ Now we can see that all works well with the command "host" from client2 :
 TODO inserer resultatHostDepuisClient2.png  
 
 The mask /22 means that there are 1024 addresses possible and have the subnet mask 255.255.252.0
+
+We scan all the machines from the LAN SERVER network and find these IP :
+
+TODO : Inserer nmap.png
+
+We can find the following correspondance between the IP address and the name of the machine :
+
+<blockquote>
+10.0.1.1 : a1,
+10.0.1.2 : a2,
+10.0.2.1 : s1,
+10.0.2.2 : s2,
+10.0.2.3 : s3,
+10.0.3.1 : p1,
+10.0.3.2 : p2
+</blockquote>
+
+We need now to create the reverse DNS zone to allow us to go from the IP to the name. For that we have to write this :
+
+<blockquote>
+zone "2.0.10.in-addr.arpa" {
+
+type master;
+
+file "/etc/bind/db.netas-rev";
+
+};
+</blockquote>
+
+We can see it works by the command "host < IP of the machine >
+
+TODO: Inserer hostReverseDNS.png
+
+We must now add a new subdomain in /etc/bind/named.conf.local for the zone "perf.netas". We add also the configuration file associated as db.perf.netas.
+
+We need to make dns2 a secondary server of perf.netas on dns1 : edit the named.conf.local on dns2 as following 
+
+TODO : inserer named.conf.localDNS2.png
+
+Then we can try to test the speed of rate on client1 and client2 simultanously as we can see here :
+
+TODO :Inserer iperf.png
+
+bug dans le reload 

@@ -1,55 +1,60 @@
-### CISSOKHO Issiaka PASCAL Arthur
-# DNS or how to give a name to an IP
-### Presentation
+# DNS or how to give aname to an IP
+# Presentation
+###### CISSOKHO Issiaka PASCAL Arthur
 Here is a little presentation from both of us.
-We are students from the computer science departement of the IUT of Bordeaux. Issiaka did his first year of study in Montpellier and Arthur in Bordeaux. We are both intersted in computer science and really involved in our studies. Issiaka learn to his cat to pee in the toilet and Arthur broke his arm while trying to impress his grandma.
+We are both students from the IT departement of the IUT of Bordeaux. 
+Issiaka did his first year of study in Montpellier and Arthur in Bordeaux. We are both interested in computer science, technologies, and we are proudly involved in our studies. 
+Apart from school, Issiaka taught his cat to pee in the toilet meanwhile Arthur broke his arm while trying to impress his grandma.
+
 ## Getting started
 
 ### IP and name configuration
-To begin with, we have to configurate client 1, client2, DNS1 and DNS2 to allow them to have IP addresses from the DHCP server on root. For that we have to write on etc/network/interface file the following line :
+To begin with, we have to configurate client 1, client2, DNS1 and DNS2 to allow them to have IP addresses from the DHCP server on root. 
+For that, we have to write on etc/network/interface file the following line :
 
 >iface eth0 inet dhcp
 
-Our machines have this IP :
+The virtual machines have these IPs :
 
->Client1: 192.168.0.10
+>**Client1**: 192.168.0.10
 
->Client2: 192.168.0.20
+>**Client2**: 192.168.0.20
 
->dns1: 192.168.0.1
+>**dns1**: 192.168.0.1
 
->dns2: 192.168.0.2
+>**dns2**: 192.168.0.2
 
-The routing table is the folowing : ![route](captures/route.png)
+Here's an extract of the routing table : ![route](captures/route.png)
 
-We can see that the gateway have the IP 192.168.0.254
+The gateway's IP has the address 192.168.0.254
 ### Dns client configuration
-Now, we edit the etc/hosts file of dns1 to give a name to the IP adresses associated with the machines. 
+The next step would be to set up the **etc/hosts** file of dns1 to give a name to the IP adresses associated with the machines. 
 
 <blockquote>192.168.0.10   client1 
 192.168.0.20   client2
 192.168.0.2    dns2
 </blockquote>
  
-We can see on the resolv.conf file that the "nameserver" IP is 172.16.0.3. This IP is given by the DHCP server "root".
+We can see on the **resolv.conf** file that the nameserver IP is 172.16.0.3. 
+This IP is given by the DHCP server **root**.
 
-Now we edit the /etc/dhcp/dhclient.conf file with for the DNS machine:
+Edit the **/etc/dhcp/dhclient.conf** file with for the DNS machine:
 
 >supersede domain-name-servers 127.0.0.1;
 
-and for the clients :
+and also for clients :
 
 >supersede domain-name-servers < ip of the DNS server associated >
 
-We can see that when we ifdown the interface eth0 on client and then ifup the resolv.conf file changes :
+When the commands <em>ifdown</em> and <em>ifdown</em> are typed in for the **interface eth0** on any client, the resolv.conf file changes :
 
 ![resolv](captures/resolv.conf.png)
 
-Then, we edit the /etc/bind/named.conf.options on dns1 and dns2 to allow external DNS requests.
+Next you should edit the **/etc/bind/named.conf.options** on dns1 and dns2 to **allow external DNS requests**.
 
 ## DNS servers configuration
 ### Primary server configuration
-To begin with, we edit the /etc/bind/named.conf.local file with 
+First of all, edit the **/etc/bind/named.conf.local** file with 
 <blockquote>
 zone "netas"{    
 
@@ -59,9 +64,10 @@ file "/etc/bind/db.netas";
 
 };
 </blockquote>
-With that the dns1 will be in charge of the main domain "netas".
 
-Then we have to copy the the /etc/bind/db.empty file in /etc/bind/db.netas
+Including this piece of code into the file will grant dns1 to be in charge of the main domain "netas".
+
+We then have to copy the the /etc/bind/db.empty file in /etc/bind/db.netas
 
 After that, we can we have to update the /etc/bind/db.netas file with this entry :
 

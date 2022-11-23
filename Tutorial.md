@@ -6,7 +6,39 @@ We are both students from the IT departement of the IUT of Bordeaux.
 Issiaka did his first year of study in Montpellier and Arthur in Bordeaux. We are both interested in computer science, technologies, and we are proudly involved in our studies. 
 Apart from school, Issiaka taught his cat to pee in the toilet meanwhile Arthur broke his arm while trying to impress his grandma.
 
+[1 - Getting started](#1)
+[1.1 - IP and name configuration](#1.1)
+
+[2 - DNS client configuration](#2)
+
+[3 - DNS server configuration](#3)
+[3.1 - Primary server configuration](#3.1)
+[3.2 - Secondary configuration ](#3.2)
+
+[4 - LAN server study](#4)
+
+[5 - Reverse zone configuration](#5)
+
+[6 - Subdomain configuration](#6)
+
+[7 - Configuration of a new sub-domain](#7)
+
+[8 - Setting up a DNS cache poisoning attack](#8)
+
+[9 - Portfolio](#9)
+
+
+
+
+
+
+
+
+<a id="1"></a>
+
 ## Getting started
+
+<a id="1.1"></a>
 
 ### IP and name configuration
 To begin with, we have to configurate client 1, client2, DNS1 and DNS2 to allow them to have IP addresses from the DHCP server on root. 
@@ -27,7 +59,11 @@ The virtual machines have these IPs :
 Here's an extract of the routing table : ![route](captures/route.png)
 
 The gateway's IP has the address 192.168.0.254
-### Dns client configuration
+
+<a id="2"></a>
+
+
+### DNS client configuration
 The next step would be to set up the ***etc/hosts*** file of dns1 to give a name to the IP adresses associated with the machines. 
 
 <blockquote>192.168.0.10   client1 
@@ -52,7 +88,12 @@ When the commands <em>ifdown</em> and <em>ifdown</em> are typed in for the **int
 
 Next you should edit the ***/etc/bind/named.conf.options*** on dns1 and dns2 to **allow external DNS requests**.
 
+<a id="3"></a>
+
 ## DNS servers configuration
+
+<a id="3.1"></a>
+
 ### Primary server configuration
 First of all, edit the ***/etc/bind/named.conf.local*** file with 
 <blockquote>
@@ -82,12 +123,17 @@ It's now possible to ping ***dn1.netas***, ***dns2.netas,*** ***dns-primaire.net
 
 ![ping](captures/pingVersLesServeursDns.png)
 
+<a id="3.2"></a>
+
 ### Secondary configuration 
 Edit ***/etc/bind/named.conf.local*** on **dns2** to declare the netas zone as secondary from the server **dns1**.
 
 Make sure everything's working correctly with the command "host" from client2 :
 
 ![resultatClient2](captures/resultatHostDepuisClient2.png)
+
+<a id="4"></a>
+
 
 ### Lan server study
 Mask /22 means that there are 1024 addresses possible and they all have the subnet mask 255.255.252.0
@@ -108,6 +154,9 @@ We can find the following correspondance between the IP address and the name of 
 10.0.3.2 : p2
 </blockquote>
 
+<a id="5"></a>
+
+
 ### Reverse zone configuration
 We need to create the reverse DNS zone to allow us to go from the IP address to the name. 
 For that we have to type this :
@@ -126,6 +175,9 @@ We can see it working by the command **host < IP of the machine >**
 
 ![hostReverseDNS](captures/hostReverseDNS.png)
 
+<a id="6"></a>
+
+
 ### Subdomain configuration
 We must now add a new subdomain in ***/etc/bind/named.conf.local*** for the zone **perf.netas**. We also add the configuration file associated as **db.perf.netas**.
 
@@ -143,6 +195,8 @@ Now we have to configure the reverse zone of the scale.perf.netas. To do that, w
 
 Now we can host **p1.netas** and **p2.netas** and see their addresses are 10.0.3.1 and 10.0.3.2
 
+<a id="7"></a>
+
 ### Configuration of a new sub-domain
 
 We now create a new sub-domain for **a1** and **a2** which have administration website.
@@ -158,6 +212,8 @@ At that point we can ping on **client1** and **client2** as we can see here :
 
 ![pingDepuisClient1](captures/pingDepuisClient1.png)
 ![pingDepuisClient2](captures/pingDepuisClient2.png)
+
+<a id="8"></a>
 
 ## Setting up a DNS cache poisoning attack
 
@@ -175,6 +231,7 @@ If we try to access **google.fr**, the website is replaced by the website locate
 ![siteHacke](captures/siteHacke.png)
 ![dnsSpoof](captures/dnsSpoof.png)
 
+<a id="9"></a>
 
 ### Portfolio
 

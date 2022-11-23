@@ -28,7 +28,7 @@ Here's an extract of the routing table : ![route](captures/route.png)
 
 The gateway's IP has the address 192.168.0.254
 ### Dns client configuration
-The next step would be to set up the **etc/hosts** file of dns1 to give a name to the IP adresses associated with the machines. 
+The next step would be to set up the ***etc/hosts*** file of dns1 to give a name to the IP adresses associated with the machines. 
 
 <blockquote>192.168.0.10   client1 
 192.168.0.20   client2
@@ -38,7 +38,7 @@ The next step would be to set up the **etc/hosts** file of dns1 to give a name t
 We can see on the **resolv.conf** file that the nameserver IP is 172.16.0.3. 
 This IP is given by the DHCP server **root**.
 
-Edit the **/etc/dhcp/dhclient.conf** file with for the DNS machine:
+Edit the ***/etc/dhcp/dhclient.conf*** file with for the DNS machine:
 
 >supersede domain-name-servers 127.0.0.1;
 
@@ -50,11 +50,11 @@ When the commands <em>ifdown</em> and <em>ifdown</em> are typed in for the **int
 
 ![resolv](captures/resolv.conf.png)
 
-Next you should edit the **/etc/bind/named.conf.options** on dns1 and dns2 to **allow external DNS requests**.
+Next you should edit the ***/etc/bind/named.conf.options*** on dns1 and dns2 to **allow external DNS requests**.
 
 ## DNS servers configuration
 ### Primary server configuration
-First of all, edit the **/etc/bind/named.conf.local** file with 
+First of all, edit the ***/etc/bind/named.conf.local*** file with 
 <blockquote>
 zone "netas"{    
 
@@ -65,33 +65,34 @@ file "/etc/bind/db.netas";
 };
 </blockquote>
 
-Including this piece of code into the file will grant dns1 to be in charge of the main domain "netas".
+Including this piece of code into the file will grant dns1 to be in charge of the main domain **netas**.
 
 We then have to copy the the /etc/bind/db.empty file in /etc/bind/db.netas
 
-After that, we can we have to update the /etc/bind/db.netas file with this entry :
+After that, we can update the /etc/bind/db.netas file with this entry :
 
 ![db.netasModif](captures/db.netasModif.png)
 
-So, now we have the aliases for the dns1 and dns2 machine with this names and dns-primaire, dns-secondaire name too
+The next step would be to add the aliases for **dns1**, **dns2** and to add <em>dns-primaire</em> and <em>dns-secondaire</em> respectively to **dns1** and **dns2**.
 
-Don't forget to update the serial number
+**It is important to not forget to update the serial number every time you edit this file !**
 
-We can see the changes by realoading or restarting the dns and now we can ping from client1 and client2 as we can see :
+We can see the changes by reloading or restarting the dns.
+It's now possible to ping ***dn1.netas***, ***dns2.netas,*** ***dns-primaire.netas*** and ***dns-secondaire.netas*** from **client1** and **client2** :
 
 ![ping](captures/pingVersLesServeursDns.png)
 
 ### Secondary configuration 
-Now we edit the /etc/bind/named.conf.local on the dns2 to declare the netas zone as secondary from the server dns1.
+Edit ***/etc/bind/named.conf.local*** on **dns2** to declare the netas zone as secondary from the server **dns1**.
 
-Now we can see that all works well with the command "host" from client2 :
+Make sure everything's working correctly with the command "host" from client2 :
 
 ![resultatClient2](captures/resultatHostDepuisClient2.png)
 
 ### Lan server study
-The mask /22 means that there are 1024 addresses possible and have the subnet mask 255.255.252.0
+Mask /22 means that there are 1024 addresses possible and they all have the subnet mask 255.255.252.0
 
-We scan all the machines from the LAN SERVER network and find these IP :
+We scan with **nmap** all the machines from the LAN SERVER network and find these IP :
 
 ![nmap](captures/nmap.png)
 
@@ -105,10 +106,11 @@ We can find the following correspondance between the IP address and the name of 
 10.0.2.3 : s3,
 10.0.3.1 : p1,
 10.0.3.2 : p2
+</blockquote>
 
 ### Reverse zone configuration
-</blockquote>
-We need now to create the reverse DNS zone to allow us to go from the IP to the name. For that we have to write this :
+We need to create the reverse DNS zone to allow us to go from the IP address to the name. 
+For that we have to type this :
 
 <blockquote>
 zone "2.0.10.in-addr.arpa" {
@@ -120,54 +122,55 @@ file "/etc/bind/db.netas-rev";
 };
 </blockquote>
 
-We can see it works by the command "host < IP of the machine >
+We can see it working by the command **host < IP of the machine >**
 
 ![hostReverseDNS](captures/hostReverseDNS.png)
 
 ### Subdomain configuration
-We must now add a new subdomain in /etc/bind/named.conf.local for the zone "perf.netas". We add also the configuration file associated as db.perf.netas.
+We must now add a new subdomain in ***/etc/bind/named.conf.local*** for the zone **perf.netas**. We also add the configuration file associated as **db.perf.netas**.
 
-We need to make dns2 a secondary server of perf.netas on dns1 : edit the named.conf.local on dns2 as following 
+We need to make **dns2** a secondary server of **perf.netas** on **dns1** : edit the ***named.conf.local*** on **dns2** as following : 
 
 ![named.conf.localDNS2](captures/named.conf.localDNS2.png)
 
-Then we can try to test the speed of rate on client1 and client2 simultanously as we can see here :
+Then we test the rate speed on **client1** and **client2** simultanously as we can see here :
 
 ![iperf](captures/iperf.png)
 
-We have now to do the reverse zone of the scale.perf.netas. To do that we have to edit the /etc/bind/db.perf.netas-rev as following : 
+Now we have to configure the reverse zone of the scale.perf.netas. To do that, we have to edit the ***/etc/bind/db.perf.netas-rev*** : 
 
 ![db.perf.netas-rev.png](captures/db.perf.netas-rev.png)
 
-Now we can host p1.netas and p2.netas and see their addresses are 10.0.3.1 and 10.0.3.2
+Now we can host **p1.netas** and **p2.netas** and see their addresses are 10.0.3.1 and 10.0.3.2
 
 ### Configuration of a new sub-domain
 
-We have now to do a new sub-domain for a1 and a2 which have administration website.
+We now create a new sub-domain for **a1** and **a2** which have administration website.
 
-To do that we have to repeat the process like we did for p1 and p2.
+Repeat the process like we did before for **p1** and **p2**.
 
-We edit the /etc/bind/named.conf.local in dns1 to add the zone "admin.netas"
+We edit once gain ***/etc/bind/named.conf.local*** in **dns1** to add the zone **admin.netas**
 
-Then we added the "slave" zone in dns2
+Then we added the **slave** zone in dns2
 
-Then we created the /etc/bind/db.admin.netas file on dns1 which has the IP addresses of the a1 and a2 machines and then we can ping on client1 and client2 as we can see here :
+Create ***/etc/bind/db.admin.netas*** on **dns1** which will have the IP addresses of **a1** and **a2**.
+At that point we can ping on **client1** and **client2** as we can see here :
 
 ![pingDepuisClient1](captures/pingDepuisClient1.png)
 ![pingDepuisClient2](captures/pingDepuisClient2.png)
 
 ## Setting up a DNS cache poisoning attack
 
-To begin this attack we have to create a file with a corresponding IP address from 192.168.0.42. We decided to choose google.fr.
+To begin this attack, create a file with an IP address from **192.168.0.42** and a **domain name**. We decided to choose **google.fr**.
 
-Then we launch the client2 machine with a virtual desktop with startx command to begin the arp Spoofing command with arpspoof. This command take for first argument the IP address of the victim and then the real gateway (dns1).
+Then we launch **client2**'s graphical interface with **startx** to begin the ARP Spoofing with **arpspoof**. This command take for first argument the **IP address** of the victim and then the **real gateway** (here **dns1**).
 > arpspoof - t 192.168.0.10 192.168.0.1
 
-We now add the dnsspoof command with paramater the interface and then the file we created before.
+We now add the **dnsspoof** command, with first the interface **eth0** and then **the file we just created** :
 
 > dnsspoof -i eth0 -f /etc/filePirate
 
-Now if we try to access google.fr the site is replaced by the site on 192.168.0.42 as we can see :
+If we try to access **google.fr**, the website is replaced by the website located on 192.168.0.42 :
 
 ![siteHacke](captures/siteHacke.png)
 ![dnsSpoof](captures/dnsSpoof.png)
@@ -175,4 +178,6 @@ Now if we try to access google.fr the site is replaced by the site on 192.168.0.
 
 ### Portfolio
 
-We are going to do a feedback of this project with some picture of our configurations files and some explanation of what works were expected and how we managed to do it. For example we can say that we install two dns servers and deploy it on a network with some machines. We created three zones and subdomains and their reverse zone. We had three weeks to do it and we worked a lot on the two firsts so we finished in time.
+We are going to do a feedback of this project with some picture of our configurations files and some explanations of how it functions, what was expected and how we managed to do it. 
+To give a quick example, we installed two DNS servers and deployed them on a network loaded with virtual machines. We created three zones and subdomains and their reverse zone. 
+We had three weeks to do it and we put in a lot of work right at the start. The job was done quite rapidly, but it took us some time to fix problems.
